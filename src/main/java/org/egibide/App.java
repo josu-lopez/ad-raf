@@ -11,11 +11,11 @@ import java.util.ArrayList;
  */
 public class App {
     public static void main(String[] args) {
-        escribirEmpleados();
+        //escribirEmpleados();
 
-        leerEmpleados();
+        //leerEmpleados();
 
-        //leerEmpleado(5);
+        leerEmpleado(7);
 
         //modificarEmpleado(6, "Fernández", 30, 7777.3)
     }
@@ -108,7 +108,50 @@ public class App {
     }
 
     public static void leerEmpleado(Integer idEmpleado) {
-        /***/
+        try {
+            File fichero = new File("./ficheros/AleatorioEmple.dat");
+            // Declaramos el fichero de acceso aleatorio
+            RandomAccessFile file = new RandomAccessFile(fichero, "r");
+
+            Empleado empleado = new Empleado();
+
+            char[] buffer = new char[10];
+
+            long posicion = (idEmpleado - 1) * 36; // Calculamos la posición en la que debería estar el empleado que nos solicitan
+
+            if (posicion >= file.length() || posicion < 0) {
+                // Si la posición calculada está más alla del final del fichero o es negativa
+                System.err.println("Error al acceder al empleado: no existe");
+            } else {
+                file.seek(posicion); // Nos posicionamos al inicio del empleado
+                empleado.setIdEmpleado(file.readInt()); // Obtenemos el id del empleado, que es lo primero que está guardado
+
+                if (idEmpleado != empleado.getIdEmpleado()) {
+                    System.err.println("Error al acceder al empleado: su posición en el fichero no es correcta");
+                } else {
+                    // Recorremos uno a uno los caracteres del apellido
+                    for (int i = 0; i < buffer.length; i++) { // En este caso será de 10 el bucle
+                        buffer[i] = file.readChar(); // Se van guardando en el array apellido
+                    }
+
+                    // Se convierte a String el array
+                    empleado.setApellido(new String(buffer).replace("\u0000", "")); // Reemplazamos el caracter \u0000 con un string vacio
+
+                    // Obtenemos el departamento
+                    empleado.setDepartamento(file.readInt());
+
+                    // Salario;
+                    empleado.setSalario(file.readDouble());
+
+                    // Mostramos por pantalla los datos leidos desde el fichero
+                    System.out.println(empleado);
+                }
+            }
+        } catch (FileNotFoundException e) {
+            System.err.println("Error al abrir el fichero: " + e.getMessage());
+        } catch (IOException e) {
+            System.err.println("Error de E/S: " + e.getMessage());
+        }
     }
 
     public static void modificarEmpleado(Integer idEmpleado, String apellido, int departamento, double salario) {
