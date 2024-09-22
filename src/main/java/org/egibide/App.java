@@ -95,6 +95,8 @@ public class App {
                 // Nos posicionamos para el siguiente empleando, teniendo en cuenta que cada uno ocupa 36 bytes
                 posicion = posicion + 36;
             }
+            
+            file.close();
 
             // Mostramos por pantalla los datos leidos desde el fichero
             for (Empleado emp : empleados) {
@@ -147,6 +149,8 @@ public class App {
                     System.out.println(empleado);
                 }
             }
+
+            file.close();
         } catch (FileNotFoundException e) {
             System.err.println("Error al abrir el fichero: " + e.getMessage());
         } catch (IOException e) {
@@ -155,6 +159,37 @@ public class App {
     }
 
     public static void modificarEmpleado(Integer idEmpleado, String apellido, int departamento, double salario) {
-        /***/
+        try {
+            File fichero = new File("./ficheros/AleatorioEmple.dat");
+            // Declaramos el fichero de acceso aleatorio
+            RandomAccessFile file = new RandomAccessFile(fichero, "rw");
+
+            long posicion = (idEmpleado - 1) * 36; // Calculamos la posición en la que debería estar el empleado que nos solicitan
+
+            if (posicion >= file.length() || posicion < 0) {
+                // Si la posición calculada está más alla del final del fichero o es negativa
+                System.err.println("Error al acceder al empleado: no existe");
+            } else {
+                file.seek(posicion); // Nos posicionamos al inicio del empleado
+                int idEmpleadoFichero = file.readInt(); // Obtenemos el id del empleado, que es lo primero que está guardado
+
+                if (idEmpleado != idEmpleadoFichero) {
+                    System.err.println("Error al acceder al empleado: su posición en el fichero no es correcta");
+                } else {
+                    long posicionInicioApellido = file.getFilePointer();
+                    file.writeChars(apellido.length() > 10 ? apellido.substring(0,10) : apellido); // Insertamos el apellido asegurándonos de que ocupa 10 o menos caractéres
+                    file.seek(posicionInicioApellido+20); // Nos movemos al inicio del apellido + 20 bytes para 10 caracteres
+                    file.writeInt(departamento); // Insertamos el departamento
+                    file.writeDouble(salario); // Insertamos salario
+                    System.out.println("Empleado " + idEmpleado + " modificado correctamente");
+                }
+            }
+
+            file.close();
+        } catch (FileNotFoundException e) {
+            System.err.println("Error al abrir el fichero: " + e.getMessage());
+        } catch (IOException e) {
+            System.err.println("Error de E/S: " + e.getMessage());
+        }
     }
 }
