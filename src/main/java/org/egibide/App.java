@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 /**
@@ -42,12 +41,12 @@ public class App {
                 file.writeInt(empleado.getIdEmpleado());
                 System.out.println("Posición inicio apellido: " + file.getFilePointer());
                 long posicionInicioApellido = file.getFilePointer();
-                file.writeChars(empleado.getApellido().length() > 10 ? empleado.getApellido().substring(0,10) : empleado.getApellido()); //Insertamos el apellido asegurándonos de que ocupa 10 o menos caractéres
+                file.writeChars(empleado.getApellido().length() > 10 ? empleado.getApellido().substring(0,10) : empleado.getApellido()); // Insertamos el apellido asegurándonos de que ocupa 10 o menos caractéres
                 file.seek(posicionInicioApellido+20); // Nos movemos al inicio del apellido + 20 bytes para 10 caracteres
                 System.out.println("Posición inicio departamento: " + file.getFilePointer());
-                file.writeInt(empleado.getDepartamento()); //Insertamos el departamento
+                file.writeInt(empleado.getDepartamento()); // Insertamos el departamento
                 System.out.println("Posición inicio salario: " + file.getFilePointer());
-                file.writeDouble(empleado.getSalario()); //Insertamos salario
+                file.writeDouble(empleado.getSalario()); // Insertamos salario
                 System.out.println("Posición final empleado: " + file.getFilePointer());
             }
 
@@ -73,31 +72,31 @@ public class App {
 
             while(file.getFilePointer() != file.length()) {
                 Empleado empleado = new Empleado();
-                file.seek(posicion); //Nos posicionamos al inicio del empleado
-                empleado.setIdEmpleado(file.readInt()); //Obtenemos el id del empleado, que es lo primero que está guardado
+                file.seek(posicion); // Nos posicionamos al inicio del empleado
+                empleado.setIdEmpleado(file.readInt()); // Obtenemos el id del empleado, que es lo primero que está guardado
 
-                //Recorremos uno a uno los caracteres del apellido
-                for (int i = 0; i < buffer.length; i++) { //En este caso será de 10 el bucle
-                    buffer[i] = file.readChar(); //Se van guardando en el array apellido
+                // Recorremos uno a uno los caracteres del apellido
+                for (int i = 0; i < buffer.length; i++) { // En este caso será de 10 el bucle
+                    buffer[i] = file.readChar(); // Se van guardando en el array apellido
                 }
 
-                //Se convierte a String el array
+                // Se convierte a String el array
                 empleado.setApellido(new String(buffer).replace("\u0000", "")); // Reemplazamos el caracter \u0000 con un string vacio
 
-                //Obtenemos el departamento
+                // Obtenemos el departamento
                 empleado.setDepartamento(file.readInt());
 
-                //Salario;
+                // Salario;
                 empleado.setSalario(file.readDouble());
 
-                //Guardamos el empleado en la lista
+                // Guardamos el empleado en la lista
                 empleados.add(empleado);
 
-                //Nos posicionamos para el siguiente empleando, teniendo en cuenta que cada uno ocupa 36 bytes
+                // Nos posicionamos para el siguiente empleando, teniendo en cuenta que cada uno ocupa 36 bytes
                 posicion = posicion + 36;
             }
 
-            // Mostramos por pantallas los datos leidos desde el fichero
+            // Mostramos por pantalla los datos leidos desde el fichero
             for (Empleado emp : empleados) {
                 System.out.println(emp);
             }
