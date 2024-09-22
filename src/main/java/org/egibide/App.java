@@ -65,7 +65,7 @@ public class App {
             // Declaramos el fichero de acceso aleatorio
             RandomAccessFile file = new RandomAccessFile(fichero, "r");
 
-            ArrayList<Empleado> empleados = new ArrayList<Empleado>();
+            ArrayList<Empleado> empleados = new ArrayList<>();
 
             char[] buffer = new char[10];
 
