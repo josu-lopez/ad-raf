@@ -15,9 +15,15 @@ public class App {
 
         //leerEmpleados();
 
-        leerEmpleado(7);
+        //leerEmpleado(6);
 
-        //modificarEmpleado(6, "Fernández", 30, 7777.3)
+        //modificarEmpleado(6, "Fernández", 30, 7777.3);
+
+        //leerEmpleado(6);
+
+        int idEmpleado = crearEmpleado("Otxoa de Azpuru", 50, 2222.2);
+
+        leerEmpleado(idEmpleado);
     }
 
     public static void escribirEmpleados() {
@@ -41,8 +47,8 @@ public class App {
                 file.writeInt(empleado.getIdEmpleado());
                 System.out.println("Posición inicio apellido: " + file.getFilePointer());
                 long posicionInicioApellido = file.getFilePointer();
-                file.writeChars(empleado.getApellido().length() > 10 ? empleado.getApellido().substring(0,10) : empleado.getApellido()); // Insertamos el apellido asegurándonos de que ocupa 10 o menos caractéres
-                file.seek(posicionInicioApellido+20); // Nos movemos al inicio del apellido + 20 bytes para 10 caracteres
+                file.writeChars(empleado.getApellido().length() > 10 ? empleado.getApellido().substring(0, 10) : empleado.getApellido()); // Insertamos el apellido asegurándonos de que ocupa 10 o menos caractéres
+                file.seek(posicionInicioApellido + 20); // Nos movemos al inicio del apellido + 20 bytes para 10 caracteres
                 System.out.println("Posición inicio departamento: " + file.getFilePointer());
                 file.writeInt(empleado.getDepartamento()); // Insertamos el departamento
                 System.out.println("Posición inicio salario: " + file.getFilePointer());
@@ -70,7 +76,7 @@ public class App {
 
             long posicion = file.getFilePointer();
 
-            while(file.getFilePointer() != file.length()) {
+            while (file.getFilePointer() != file.length()) {
                 Empleado empleado = new Empleado();
                 file.seek(posicion); // Nos posicionamos al inicio del empleado
                 empleado.setIdEmpleado(file.readInt()); // Obtenemos el id del empleado, que es lo primero que está guardado
@@ -95,7 +101,7 @@ public class App {
                 // Nos posicionamos para el siguiente empleando, teniendo en cuenta que cada uno ocupa 36 bytes
                 posicion = posicion + 36;
             }
-            
+
             file.close();
 
             // Mostramos por pantalla los datos leidos desde el fichero
@@ -177,8 +183,8 @@ public class App {
                     System.err.println("Error al acceder al empleado: su posición en el fichero no es correcta");
                 } else {
                     long posicionInicioApellido = file.getFilePointer();
-                    file.writeChars(apellido.length() > 10 ? apellido.substring(0,10) : apellido); // Insertamos el apellido asegurándonos de que ocupa 10 o menos caractéres
-                    file.seek(posicionInicioApellido+20); // Nos movemos al inicio del apellido + 20 bytes para 10 caracteres
+                    file.writeChars(apellido.length() > 10 ? apellido.substring(0, 10) : apellido); // Insertamos el apellido asegurándonos de que ocupa 10 o menos caractéres
+                    file.seek(posicionInicioApellido + 20); // Nos movemos al inicio del apellido + 20 bytes para 10 caracteres
                     file.writeInt(departamento); // Insertamos el departamento
                     file.writeDouble(salario); // Insertamos salario
                     System.out.println("Empleado " + idEmpleado + " modificado correctamente");
@@ -191,5 +197,39 @@ public class App {
         } catch (IOException e) {
             System.err.println("Error de E/S: " + e.getMessage());
         }
+    }
+
+    private static int crearEmpleado(String apellido, int departamento, double salario) {
+        int idEmpleado = -1;
+
+        try {
+            File fichero = new File("./ficheros/AleatorioEmple.dat");
+            // Declaramos el fichero de acceso aleatorio
+            RandomAccessFile file = new RandomAccessFile(fichero, "rw");
+
+            long posicion = file.length() - 36; // Calculamos la posición en la que debería estar el último empleado
+
+            if (posicion < 0) {
+                // No hay ningún empleado, el fichero está vacio
+                idEmpleado = 1;
+            } else {
+                file.seek(posicion); // Nos posicionamos al inicio del último empleado
+                idEmpleado = file.readInt() + 1; // Obtenemos el id del empleado, que es lo primero que está guardado
+            }
+            file.seek(file.length()); // Nos posicionamos al final del fichero
+            file.writeInt(idEmpleado);
+            long posicionInicioApellido = file.getFilePointer();
+            file.writeChars(apellido.length() > 10 ? apellido.substring(0, 10) : apellido); // Insertamos el apellido asegurándonos de que ocupa 10 o menos caractéres
+            file.seek(posicionInicioApellido + 20); // Nos movemos al inicio del apellido + 20 bytes para 10 caracteres
+            file.writeInt(departamento); // Insertamos el departamento
+            file.writeDouble(salario); // Insertamos salario
+            file.close();
+            System.out.println("Empleado " + idEmpleado + " creado correctamente");
+        } catch (FileNotFoundException e) {
+            System.err.println("Error al abrir el fichero: " + e.getMessage());
+        } catch (IOException e) {
+            System.err.println("Error de E/S: " + e.getMessage());
+        }
+        return idEmpleado;
     }
 }
